@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Wallpaper Replacement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #canvas {
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Wallpaper Replacement</h1>
+    <p>Upload an image of your wall and a wallpaper image</p>
+    <input type="file" id="wallUpload" accept="image/*"><br><br>
+    <input type="file" id="wallpaperUpload" accept="image/*"><br><br>
+    <button onclick="processImages()">Apply Wallpaper</button>
+    <canvas id="canvas"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="app.js"></script>
+</body>
+</html>

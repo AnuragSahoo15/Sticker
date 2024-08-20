@@ -35,7 +35,7 @@ async function processImages() {
         const [y1, x1, y2, x2] = boxes[i];
         const width = x2 - x1;
         const height = y2 - y1;
-        ctx.drawImage(wallImage, x1, y1, width, height, x1, y1, width, height);
+        ctx.drawImage(wallpaperImage, 0, 0, wallpaperImage.width, wallpaperImage.height, x1, y1, width, height);
     }
 }
 

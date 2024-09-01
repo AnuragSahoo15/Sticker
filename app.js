@@ -1,9 +1,3 @@
-async function loadModel() {
-    model = await tf.loadGraphModel('tfjs_model/model.json');
-    console.log('Model loaded');
-}
-loadModel();
-
 async function processImages() {
     const wallUpload = document.getElementById('wallUpload').files[0];
     const wallpaperUpload = document.getElementById('wallpaperUpload').files[0];
@@ -30,43 +24,32 @@ async function processImages() {
     // Get predictions from the model
     const predictions = await model.executeAsync(tensor);
 
-    // Extract boxes and classes from predictions
-    const boxes = predictions[0].arraySync();  // Assuming this contains bounding boxes
-    const classes = predictions[1].arraySync();  // Assuming this contains class labels
+    // Extract masks from predictions (assuming the model outputs masks)
+    const masks = predictions[0].arraySync();  // Adjust this index based on your model's output
 
-    // Loop through each detection
-    for (let i = 0; i < boxes.length; i++) {
-        const [y1, x1, y2, x2] = boxes[i];  // Assuming boxes are in [y1, x1, y2, x2] format
+    // Loop through each mask
+    for (let i = 0; i < masks.length; i++) {
+        const mask = masks[i]; // Get the current mask for furniture detection
 
-        // Calculate the width and height of the box
-        const width = x2 - x1;
-        const height = y2 - y1;
-
-        // Draw the wallpaper image only within the detected box region
-        ctx.drawImage(
-            wallpaperImage,        // Image to draw
-            0, 0,                  // Source x, y in the wallpaper image
-            wallpaperImage.width,  // Source width in the wallpaper image
-            wallpaperImage.height, // Source height in the wallpaper image
-            x1 * wallImage.width,  // Destination x in the canvas, scaled to canvas size
-            y1 * wallImage.height, // Destination y in the canvas, scaled to canvas size
-            width * wallImage.width,  // Destination width in the canvas, scaled to canvas size
-            height * wallImage.height  // Destination height in the canvas, scaled to canvas size
-        );
+        // Apply the wallpaper only where the mask indicates wall area (assuming mask is binary)
+        for (let y = 0; y < mask.length; y++) {
+            for (let x = 0; x < mask[y].length; x++) {
+                if (mask[y][x] === 0) { // Assuming 0 indicates wall area, adjust if necessary
+                    ctx.drawImage(
+                        wallpaperImage,
+                        0, 0,
+                        wallpaperImage.width,
+                        wallpaperImage.height,
+                        x * wallImage.width / mask[0].length,
+                        y * wallImage.height / mask.length,
+                        wallImage.width / mask[0].length,
+                        wallImage.height / mask.length
+                    );
+                }
+            }
+        }
     }
 
     // Clean up tensors to free memory
     tensor.dispose();
-}
-
-async function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => resolve(img);
-        };
-        reader.readAsDataURL(file);
-    });
 }
